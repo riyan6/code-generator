@@ -1,0 +1,34 @@
+# Compiled class file
+*.class
+
+# Log files
+*.log
+
+# IntelliJ IDEA files
+.idea/
+
+# Maven specific files
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Eclipse specific files
+.settings/
+.classpath
+.project
+.metadata/
+bin/
+
+# Gradle specific files
+.gradle/
+build/
+
+# SonarQube
+.sonar/
+
+# Mac OS specific files
+.DS_Store

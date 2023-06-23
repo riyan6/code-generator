@@ -1,7 +1,7 @@
 package org.code.generator;
 
 import lombok.SneakyThrows;
-import org.code.generator.constant.Key;
+import org.code.generator.constant.KeyConstant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.func.imp.BackendEntityGenerator;
@@ -26,7 +26,7 @@ public class CodeGeneratorApp {
         TemplateUtil.init();
 
         // 生成文件的路径
-        CacheUtil.getInstance().put(Key.FILE_SAVE_PATH, "C:\\Users\\cao\\Desktop\\code\\");
+        CacheUtil.getInstance().put(KeyConstant.FILE_SAVE_PATH, "C:\\Users\\cao\\Desktop\\code\\");
 
         // 开始构建 实体类
         IGenerator entityGenerator = new BackendEntityGenerator();
@@ -48,9 +48,9 @@ public class CodeGeneratorApp {
         CacheUtil cacheUtil = CacheUtil.getInstance();
 
         for (SystemKey key : SystemKey.values()) {
-            Object obj = properties.get(key.key());
+            Object obj = properties.get(key.value());
             if (obj == null) {
-                throw new RuntimeException("必须要有这个配置：" + key.key());
+                throw new RuntimeException("必须要有这个配置：" + key.value());
             }
             cacheUtil.put(key.value(), obj.toString());
         }

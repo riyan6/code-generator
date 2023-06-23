@@ -1,6 +1,6 @@
 package org.code.generator.constant;
 
-public interface Key {
+public interface KeyConstant {
 
     // 表名
     String ENTITY_CLASS_NAME = "entityClassName";

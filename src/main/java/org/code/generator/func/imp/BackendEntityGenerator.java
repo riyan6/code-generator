@@ -1,8 +1,9 @@
 package org.code.generator.func.imp;
 
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
-import org.code.generator.constant.Key;
+import org.code.generator.constant.KeyConstant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.model.entity.TableColumnDefinition;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class BackendEntityGenerator implements IGenerator {
 
     @Override
-    public boolean generator() {
+    public void generator() {
 
         try {
             List<TableColumnDefinition> columnDefinitions = getColumnDefinition();
@@ -38,7 +39,7 @@ public class BackendEntityGenerator implements IGenerator {
             dataModel.put(SystemKey.TABLE_NAME.value(), CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value()));
             // 实体类 类名
             String entityClassName = toJavaClassName(CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value()));
-            dataModel.put(Key.ENTITY_CLASS_NAME, entityClassName);
+            dataModel.put(KeyConstant.ENTITY_CLASS_NAME, entityClassName);
 
             // 设置初始值避免程序异常
             dataModel.put("primaryColumn", "_");
@@ -75,25 +76,23 @@ public class BackendEntityGenerator implements IGenerator {
                     .collect(Collectors.toList());
             dataModel.put("columns", columns);
 
-            String outputFilePath = CacheUtil.getInstance().get(Key.FILE_SAVE_PATH) + entityClassName + ".java";
+            String outputFilePath = CacheUtil.getInstance().get(KeyConstant.FILE_SAVE_PATH) + entityClassName + ".java";
             Writer fileWriter = new FileWriter(outputFilePath);
             template.process(dataModel, fileWriter);
             fileWriter.flush();
             fileWriter.close();
 
             // 存储数据到缓存共其他层使用
-            CacheUtil.getInstance().put(Key.ENTITY_CLASS_NAME, entityClassName);
+            CacheUtil.getInstance().put(KeyConstant.ENTITY_CLASS_NAME, entityClassName);
 
-            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Console.error("生成实体类代码失败，错误信息：", e.getMessage());
         }
-
-        return false;
     }
 
     /**
      * 将 数据库表名 转成 符合Java规范的类名
+     *
      * @param tableName
      * @return
      */
@@ -112,7 +111,7 @@ public class BackendEntityGenerator implements IGenerator {
     }
 
     /**
-     * 获取表的列配置
+     * 获取表的列配置 MySQL 查询的表结构信息
      *
      * @return
      * @throws SQLException
@@ -139,12 +138,12 @@ public class BackendEntityGenerator implements IGenerator {
      * @return
      */
     private String toJavaType(String sqlType) {
-        // 处理 sqlType，去除括号内的内容
+        // 处理 sqlType，去除括号内的内容 比如 varchar(32) 转为 varchar
         int bracketIndex = sqlType.indexOf('(');
         if (bracketIndex != -1) {
             sqlType = sqlType.substring(0, bracketIndex);
         }
-
+        // 根据 MySQL 的数据类型转为对应的 Java数据类型
         return switch (sqlType) {
             case "varchar", "char", "text" -> "String";
             case "int", "tinyint" -> "Integer";

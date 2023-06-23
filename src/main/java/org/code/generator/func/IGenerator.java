@@ -2,6 +2,10 @@ package org.code.generator.func;
 
 public interface IGenerator {
 
-    boolean generator();
+    /**
+     * 生成代码
+     * @return
+     */
+    void generator();
 
 }

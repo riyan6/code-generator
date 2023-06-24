@@ -17,6 +17,15 @@ public enum SystemKey {
     MVC_SERVICE_PACKAGE_NAME("mvcServicePackageName"),
     MVC_SERVICE_IMPL_PACKAGE_NAME("mvcServiceImplPackageName"),
     MVC_CONTROLLER_PACKAGE_NAME("mvcControllerPackageName"),
+    // file
+    FILE_SAVE_PATH("fileSavePath"),
+    // class
+    // 实体类名称
+    CLASS_ENTITY_NAME("classEntityName"),
+    CLASS_DAO_NAME("classDaoName"),
+    CLASS_SERVICE_NAME("classServiceName"),
+    CLASS_SERVICE_IMPL_NAME("classServiceImplName"),
+    CLASS_CONTROLLER_NAME("classControllerName");
     ;
 
     private String value;

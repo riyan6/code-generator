@@ -14,13 +14,12 @@ import java.util.Date;
 import java.math.BigDecimal;
 </#if>
 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("${database}.${tableName}")
-public class ${entityClassName} {
+public class ${classEntityName} {
 
 <#list columns as column>
     <#if column == primaryColumn>

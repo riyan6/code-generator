@@ -1,5 +1,7 @@
 package org.code.generator.util;
 
+import org.code.generator.constant.SystemKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +33,10 @@ public class CacheUtil {
 
     public String get(String key) {
         return map.get(key);
+    }
+
+    public String get(SystemKey key) {
+        return map.get(key.value());
     }
 
 }

@@ -1,5 +1,6 @@
 package org.code.generator.util;
 
+import cn.hutool.core.util.StrUtil;
 import org.code.generator.constant.SystemKey;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -18,14 +19,22 @@ public class DBUtil {
         return this.context;
     }
 
-    private DBUtil(String database) throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://xxx.xxx.xxx.xxx:xxx/" + database, "", "");
+    private DBUtil() throws SQLException {
+        String url = StrUtil.format("{}/{}",
+                CacheUtil.getInstance().get(SystemKey.MYSQL_URL.value()),
+                CacheUtil.getInstance().get(SystemKey.DATABASE.value())
+        );
+        Connection connection = DriverManager.getConnection(
+                url,
+                CacheUtil.getInstance().get(SystemKey.MYSQL_USER.value()),
+                CacheUtil.getInstance().get(SystemKey.MYSQL_PASSWORD.value())
+        );
         this.context = DSL.using(connection, SQLDialect.MYSQL);
     }
 
     public static void init() throws SQLException {
         if (instance == null) {
-            instance = new DBUtil(CacheUtil.getInstance().get(SystemKey.DATABASE.value()));
+            instance = new DBUtil();
         }
     }
 

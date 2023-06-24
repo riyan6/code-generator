@@ -10,8 +10,10 @@ public class TemplateUtil {
 
     private TemplateUtil() {
         this.configuration = new Configuration(Configuration.VERSION_2_3_32);
-        this.configuration.setClassForTemplateLoading(CodeGeneratorApp.class, "/templates"); // 设置模板文件的加载路径
-        this.configuration.setDefaultEncoding("UTF-8"); // 设置默认字符集
+        // 设置模板文件的加载路径
+        this.configuration.setClassForTemplateLoading(CodeGeneratorApp.class, "/templates");
+        // 设置默认字符集
+        this.configuration.setDefaultEncoding("UTF-8");
     }
 
     public Configuration configuration() {

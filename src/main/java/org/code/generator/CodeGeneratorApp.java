@@ -1,10 +1,11 @@
 package org.code.generator;
 
 import lombok.SneakyThrows;
-import org.code.generator.constant.KeyConstant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
+import org.code.generator.func.imp.BackendDaoGenerator;
 import org.code.generator.func.imp.BackendEntityGenerator;
+import org.code.generator.func.imp.BackendServiceGenerator;
 import org.code.generator.util.CacheUtil;
 import org.code.generator.util.DBUtil;
 import org.code.generator.util.TemplateUtil;
@@ -25,12 +26,16 @@ public class CodeGeneratorApp {
         // 初始化模板
         TemplateUtil.init();
 
-        // 生成文件的路径
-        CacheUtil.getInstance().put(KeyConstant.FILE_SAVE_PATH, "C:\\Users\\cao\\Desktop\\code\\");
-
+        // TODO 生成文件步骤，后续可改成责任链模式
         // 开始构建 实体类
         IGenerator entityGenerator = new BackendEntityGenerator();
         entityGenerator.generator();
+        // 开始构建 持久层
+        IGenerator daoGenerator = new BackendDaoGenerator();
+        daoGenerator.generator();
+        // 开始构建 业务层
+        IGenerator serviceGenerator = new BackendServiceGenerator();
+        serviceGenerator.generator();
     }
 
     /**

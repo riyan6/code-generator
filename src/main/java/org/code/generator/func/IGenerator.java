@@ -4,6 +4,7 @@ public interface IGenerator {
 
     /**
      * 生成代码
+     *
      * @return
      */
     void generator();

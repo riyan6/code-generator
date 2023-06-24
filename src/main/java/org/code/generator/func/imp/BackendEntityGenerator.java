@@ -3,7 +3,6 @@ package org.code.generator.func.imp;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
-import org.code.generator.constant.KeyConstant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.model.entity.TableColumnDefinition;
@@ -22,6 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author riyan6
+ * @Description: entity 代码生成
+ * @since 2023/6/22 20:35 星期四
+ */
 public class BackendEntityGenerator implements IGenerator {
 
     @Override
@@ -38,8 +42,8 @@ public class BackendEntityGenerator implements IGenerator {
             dataModel.put(SystemKey.DATABASE.value(), CacheUtil.getInstance().get(SystemKey.DATABASE.value()));
             dataModel.put(SystemKey.TABLE_NAME.value(), CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value()));
             // 实体类 类名
-            String entityClassName = toJavaClassName(CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value()));
-            dataModel.put(KeyConstant.ENTITY_CLASS_NAME, entityClassName);
+            String entityClassName = CacheUtil.getInstance().get(SystemKey.CLASS_ENTITY_NAME.value());
+            dataModel.put(SystemKey.CLASS_ENTITY_NAME.value(), entityClassName);
 
             // 设置初始值避免程序异常
             dataModel.put("primaryColumn", "_");
@@ -76,14 +80,11 @@ public class BackendEntityGenerator implements IGenerator {
                     .collect(Collectors.toList());
             dataModel.put("columns", columns);
 
-            String outputFilePath = CacheUtil.getInstance().get(KeyConstant.FILE_SAVE_PATH) + entityClassName + ".java";
+            String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH.value()) + entityClassName + ".java";
             Writer fileWriter = new FileWriter(outputFilePath);
             template.process(dataModel, fileWriter);
             fileWriter.flush();
             fileWriter.close();
-
-            // 存储数据到缓存共其他层使用
-            CacheUtil.getInstance().put(KeyConstant.ENTITY_CLASS_NAME, entityClassName);
 
         } catch (Exception e) {
             Console.error("生成实体类代码失败，错误信息：", e.getMessage());

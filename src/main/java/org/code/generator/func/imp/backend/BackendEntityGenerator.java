@@ -1,21 +1,18 @@
-package org.code.generator.func.imp;
+package org.code.generator.func.imp.backend;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import freemarker.template.Template;
+import org.code.generator.constant.Constant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.model.entity.TableColumnDefinition;
 import org.code.generator.util.CacheUtil;
-import org.code.generator.util.DBUtil;
 import org.code.generator.util.TemplateUtil;
-import org.jooq.Record;
-import org.jooq.Result;
 
 import java.io.FileWriter;
 import java.io.Writer;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,18 +29,27 @@ public class BackendEntityGenerator implements IGenerator {
     public void generator() {
 
         try {
-            List<TableColumnDefinition> columnDefinitions = getColumnDefinition();
+            List<TableColumnDefinition> columnDefinitions = JSON.parseArray(
+                    CacheUtil.getInstance().get(Constant.TABLE_COLUMN_DEFINITIONS),
+                    TableColumnDefinition.class
+            );
 
             Template template = TemplateUtil.getInstance().configuration().getTemplate("backend/entity.ftl");
-            Map<String, Object> dataModel = new HashMap<>();
-            dataModel.put(SystemKey.BASE_PACKAGE_NAME.value(), CacheUtil.getInstance().get(SystemKey.BASE_PACKAGE_NAME.value()));
-            dataModel.put(SystemKey.MVC_ENTITY_PACKAGE_NAME.value(), CacheUtil.getInstance().get(SystemKey.MVC_ENTITY_PACKAGE_NAME.value()));
-            dataModel.put(SystemKey.MODULE.value(), CacheUtil.getInstance().get(SystemKey.MODULE.value()));
-            dataModel.put(SystemKey.DATABASE.value(), CacheUtil.getInstance().get(SystemKey.DATABASE.value()));
-            dataModel.put(SystemKey.TABLE_NAME.value(), CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value()));
+            Map<String, Object> dataModel = new HashMap<>(16);
+
+            // 存储列配置
+            String jsonStr = JSON.toJSONString(columnDefinitions);
+            CacheUtil.getInstance().put(Constant.TABLE_COLUMN_DEFINITIONS, jsonStr);
+
+            addDataModel(dataModel, SystemKey.BASE_PACKAGE_NAME);
+            addDataModel(dataModel, SystemKey.MVC_ENTITY_PACKAGE_NAME);
+            addDataModel(dataModel, SystemKey.MODULE);
+            addDataModel(dataModel, SystemKey.DATABASE);
+            addDataModel(dataModel, SystemKey.TABLE_NAME);
+            addDataModel(dataModel, SystemKey.CLASS_ENTITY_NAME);
+
             // 实体类 类名
             String entityClassName = CacheUtil.getInstance().get(SystemKey.CLASS_ENTITY_NAME.value());
-            dataModel.put(SystemKey.CLASS_ENTITY_NAME.value(), entityClassName);
 
             // 设置初始值避免程序异常
             dataModel.put("primaryColumn", "_");
@@ -80,14 +86,16 @@ public class BackendEntityGenerator implements IGenerator {
                     .collect(Collectors.toList());
             dataModel.put("columns", columns);
 
-            String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH.value()) + entityClassName + ".java";
+            String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH.value()) + Constant.BACKEDN + "/" + entityClassName + ".java";
             Writer fileWriter = new FileWriter(outputFilePath);
             template.process(dataModel, fileWriter);
             fileWriter.flush();
             fileWriter.close();
 
+            // print result
+            Console.log(entityClassName + ".java", "文件生成完毕");
         } catch (Exception e) {
-            Console.error("生成实体类代码失败，错误信息：", e.getMessage());
+            Console.error("生成Entity代码失败，错误信息：", e.getMessage());
         }
     }
 
@@ -112,27 +120,6 @@ public class BackendEntityGenerator implements IGenerator {
     }
 
     /**
-     * 获取表的列配置 MySQL 查询的表结构信息
-     *
-     * @return
-     * @throws SQLException
-     */
-    private List<TableColumnDefinition> getColumnDefinition() throws SQLException {
-        String tableName = CacheUtil.getInstance().get(SystemKey.TABLE_NAME.value());
-        Result<Record> result = DBUtil.getInstance().context().fetch("DESC " + tableName);
-
-        // 封装结果
-        List<TableColumnDefinition> columns = new ArrayList<>();
-        for (Record record : result) {
-            String field = record.get("Field", String.class);
-            String type = record.get("Type", String.class);
-            String key = record.get("Key", String.class);
-            columns.add(new TableColumnDefinition(field, type, key));
-        }
-        return columns;
-    }
-
-    /**
      * 将 SQL 类型转成 Java类型
      *
      * @param sqlType
@@ -144,11 +131,16 @@ public class BackendEntityGenerator implements IGenerator {
         if (bracketIndex != -1) {
             sqlType = sqlType.substring(0, bracketIndex);
         }
-        // 根据 MySQL 的数据类型转为对应的 Java数据类型
+        // 处理 unsigned 关键字
+        boolean isUnsigned = sqlType.endsWith(" unsigned");
+        if (isUnsigned) {
+            sqlType = sqlType.replace(" unsigned", "");
+        }
+        // 根据 MySQL 的数据类型转为对应的 Java 数据类型
         return switch (sqlType) {
             case "varchar", "char", "text" -> "String";
             case "int", "tinyint" -> "Integer";
-            case "bigint" -> "Long";
+            case "bigint" -> isUnsigned ? "BigInteger" : "Long";
             case "float" -> "Float";
             case "double" -> "Double";
             case "decimal" -> "BigDecimal";

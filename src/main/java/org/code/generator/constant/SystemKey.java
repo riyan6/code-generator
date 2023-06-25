@@ -25,7 +25,12 @@ public enum SystemKey {
     CLASS_DAO_NAME("classDaoName"),
     CLASS_SERVICE_NAME("classServiceName"),
     CLASS_SERVICE_IMPL_NAME("classServiceImplName"),
-    CLASS_CONTROLLER_NAME("classControllerName");
+    CLASS_CONTROLLER_NAME("classControllerName"),
+    CLASS_CONTROLLER_API_TAGS("classControllerApiTags"),
+    CLASS_CONTROLLER_API_MAPPING("classControllerApiMapping"),
+    // 前端
+    BASE_VUE_NAME("baseVueName"),
+    SERVICE_NAME("serverName"),
     ;
 
     private String value;

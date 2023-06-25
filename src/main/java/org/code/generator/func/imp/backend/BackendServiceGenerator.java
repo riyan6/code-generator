@@ -1,7 +1,8 @@
-package org.code.generator.func.imp;
+package org.code.generator.func.imp.backend;
 
 import cn.hutool.core.lang.Console;
 import freemarker.template.Template;
+import org.code.generator.constant.Constant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.util.CacheUtil;
@@ -23,10 +24,14 @@ public class BackendServiceGenerator implements IGenerator {
     public void generator() {
         // 文件存储路径
         String serviceFilePath = new StringBuilder(CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH))
+                .append(Constant.BACKEDN)
+                .append("/")
                 .append(CacheUtil.getInstance().get(SystemKey.CLASS_SERVICE_NAME))
                 .append(".java")
                 .toString();
         String serviceImplFilePath = new StringBuilder(CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH))
+                .append(Constant.BACKEDN)
+                .append("/")
                 .append(CacheUtil.getInstance().get(SystemKey.CLASS_SERVICE_IMPL_NAME))
                 .append(".java")
                 .toString();
@@ -52,13 +57,12 @@ public class BackendServiceGenerator implements IGenerator {
             serviceTemplate.process(dataModel, serviceFileWriter);
             serviceImplTemplate.process(dataModel, serviceImplFileWriter);
 
+            // print result
+            Console.log(CacheUtil.getInstance().get(SystemKey.CLASS_SERVICE_NAME) + ".java", "文件生成完毕");
+            Console.log(CacheUtil.getInstance().get(SystemKey.CLASS_SERVICE_IMPL_NAME) + ".java", "文件生成完毕");
         } catch (Exception e) {
-            Console.error("生成业务层代码失败，错误信息：", e.getMessage());
+            Console.error("生成Service代码失败，错误信息：", e.getMessage());
         }
-    }
-
-    private void addDataModel(Map<String, Object> dataModel, SystemKey key) {
-        dataModel.put(key.value(), CacheUtil.getInstance().get(key));
     }
 
 }

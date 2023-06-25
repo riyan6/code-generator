@@ -5,6 +5,7 @@ package org.code.generator.model.entity;
  * field    字段名
  * type     字段类型
  * key      字段的索引，PRI 就是主键
+ * Comment  列备注
  */
-public record TableColumnDefinition(String field, String type, String key) {
+public record TableColumnDefinition(String field, String type, String key, String Comment) {
 }

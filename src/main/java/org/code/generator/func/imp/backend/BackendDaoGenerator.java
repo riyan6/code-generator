@@ -1,7 +1,8 @@
-package org.code.generator.func.imp;
+package org.code.generator.func.imp.backend;
 
 import cn.hutool.core.lang.Console;
 import freemarker.template.Template;
+import org.code.generator.constant.Constant;
 import org.code.generator.constant.SystemKey;
 import org.code.generator.func.IGenerator;
 import org.code.generator.util.CacheUtil;
@@ -37,19 +38,18 @@ public class BackendDaoGenerator implements IGenerator {
             addDataModel(dataModel, SystemKey.CLASS_DAO_NAME);
 
             // 生成代码
-            String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH) + daoClassName + ".java";
+            String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH) + Constant.BACKEDN + "/" + daoClassName + ".java";
             Writer fileWriter = new FileWriter(outputFilePath);
             template.process(dataModel, fileWriter);
             fileWriter.flush();
             fileWriter.close();
 
+            // print result
+            Console.log(daoClassName + ".java", "文件生成完毕");
         } catch (Exception e) {
-            Console.error("生成持久层类代码失败，错误信息：", e.getMessage());
+            Console.error("生成Dao代码失败，错误信息：", e.getMessage());
         }
     }
 
-    private void addDataModel(Map<String, Object> dataModel, SystemKey key) {
-        dataModel.put(key.value(), CacheUtil.getInstance().get(key));
-    }
 
 }

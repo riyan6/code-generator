@@ -1,11 +1,15 @@
 package org.code.generator;
 
+import cn.hutool.core.lang.Console;
 import lombok.SneakyThrows;
 import org.code.generator.constant.SystemKey;
-import org.code.generator.func.IGenerator;
-import org.code.generator.func.imp.BackendDaoGenerator;
-import org.code.generator.func.imp.BackendEntityGenerator;
-import org.code.generator.func.imp.BackendServiceGenerator;
+import org.code.generator.func.imp.backend.BackendControllerGenerator;
+import org.code.generator.func.imp.backend.BackendDaoGenerator;
+import org.code.generator.func.imp.backend.BackendEntityGenerator;
+import org.code.generator.func.imp.backend.BackendServiceGenerator;
+import org.code.generator.func.imp.frontend.FrontMainVueGenerator;
+import org.code.generator.func.imp.frontend.FrontendCfgGenerator;
+import org.code.generator.func.imp.frontend.FrontendJsGenerator;
 import org.code.generator.util.CacheUtil;
 import org.code.generator.util.DBUtil;
 import org.code.generator.util.TemplateUtil;
@@ -22,20 +26,22 @@ public class CodeGeneratorApp {
         // 读取配置设置值
         initProperties();
         // 初始化数据库
-        DBUtil.init();
+        DBUtil.init(CacheUtil.getInstance().get(SystemKey.TABLE_NAME));
         // 初始化模板
         TemplateUtil.init();
 
-        // TODO 生成文件步骤，后续可改成责任链模式
-        // 开始构建 实体类
-        IGenerator entityGenerator = new BackendEntityGenerator();
-        entityGenerator.generator();
-        // 开始构建 持久层
-        IGenerator daoGenerator = new BackendDaoGenerator();
-        daoGenerator.generator();
-        // 开始构建 业务层
-        IGenerator serviceGenerator = new BackendServiceGenerator();
-        serviceGenerator.generator();
+        // 开始生成文件
+        new BackendEntityGenerator().generator();
+        new BackendDaoGenerator().generator();
+        new BackendServiceGenerator().generator();
+        new BackendControllerGenerator().generator();
+        new FrontendJsGenerator().generator();
+        new FrontendCfgGenerator().generator();
+        new FrontMainVueGenerator().generator();
+
+        Console.log("-------------------------------------------");
+        // print
+        Console.log("程序执行完成...");
     }
 
     /**

@@ -11,6 +11,7 @@ public enum SystemKey {
     TABLE_NAME("tableName"),
     MODULE("module"),
     BASE_PACKAGE_NAME("basePackageName"),
+    BUSINESS_NAME("businessName"),
     // mvc
     MVC_ENTITY_PACKAGE_NAME("mvcEntityPackageName"),
     MVC_MAPPER_PACKAGE_NAME("mvcMapperPackageName"),

@@ -41,6 +41,7 @@ public class BackendControllerGenerator implements IGenerator {
             addDataModel(dataModel, SystemKey.CLASS_CONTROLLER_NAME);
             addDataModel(dataModel, SystemKey.CLASS_CONTROLLER_API_TAGS);
             addDataModel(dataModel, SystemKey.CLASS_CONTROLLER_API_MAPPING);
+            addDataModel(dataModel, SystemKey.BUSINESS_NAME);
 
             // 生成代码
             String outputFilePath = CacheUtil.getInstance().get(SystemKey.FILE_SAVE_PATH) + Constant.BACKEDN + "/" + controllerClassName + ".java";
